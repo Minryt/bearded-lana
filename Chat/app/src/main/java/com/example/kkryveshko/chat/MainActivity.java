@@ -1,21 +1,20 @@
 package com.example.kkryveshko.chat;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 
 public class MainActivity extends Activity {
 
-    TextView console;
+    private TextView console;
+    private Button createServer;
+    private Button createClient;
     private Core core = Core.getInstance();
 
     @Override
@@ -23,28 +22,27 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if (savedInstanceState == null) {
-            getFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
-                    .commit();
+
         }
 
-       // console = (TextView) findViewById(R.id.editText);
+        console = (TextView) findViewById(R.id.textView);
+        createServer = (Button) findViewById(R.id.buttonServer);
+        createClient = (Button) findViewById(R.id.buttonClient);
 
-        Button createServer = (Button)findViewById(R.id.server_button);
-
+        console.setMovementMethod(new ScrollingMovementMethod());
         createServer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                console.setText("Server");
+                console.append("\nServer");
             }
         });
-//
-//        findViewById(R.id.client_button).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                console.setText("Client");
-//            }
-//        });
+
+        createClient.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                console.append("\nClient");
+            }
+        });
 
         Thread mainThread = new Thread(core);
         mainThread.start();
@@ -64,21 +62,5 @@ public class MainActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            return rootView;
-        }
     }
 }
