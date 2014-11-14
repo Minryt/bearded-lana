@@ -21,30 +21,33 @@ public class MainActivity extends Activity {
         if (savedInstanceState == null) {
 
         }
-
         setViewElements();
-        initController();
         startProgram();
-    }
-
-    @Override
-    protected void onStop(){
-        model.setIsRunning(false);
+        initController();
     }
 
     private void startProgram() {
         Model.getInstance().setIsRunning(true);
         new Thread(model).start();
+        new Thread(appView).start();
     }
 
     private void setViewElements() {
         appView.setEvenLogOutput((TextView) findViewById(R.id.textView));
         appView.setButtons((Button) findViewById(R.id.buttonServer), (Button) findViewById(R.id.buttonClient));
+        appView.setActivity(this);
     }
 
     private void initController() {
+        controller.init();
         controller.createServerButton((Button) findViewById(R.id.buttonServer));
         controller.createClientButton((Button) findViewById(R.id.buttonClient));
+    }
+
+    @Override
+    protected void onStop() {
+        model.setIsRunning(false);
+        super.onStop();
     }
 
     @Override

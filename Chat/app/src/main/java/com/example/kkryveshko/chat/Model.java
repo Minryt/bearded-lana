@@ -1,20 +1,14 @@
 package com.example.kkryveshko.chat;
 
-import android.widget.EditText;
-
 /**
  * Created by Konstantin on 12.11.2014.
  */
-public class Model implements Runnable{
+public class Model implements Runnable {
 
     private static Model model;
-
-    public boolean isRunning() {
-        return isRunning;
-    }
-
     private boolean isRunning;
     private AppView view;
+    private ProgramState state;
 
     public static Model getInstance() {
         if (model == null) {
@@ -26,28 +20,61 @@ public class Model implements Runnable{
     @Override
     public void run() {
         view = AppView.getInstance();
+        state = ProgramState.START;
 
-        while(isRunning) {
+        while (isRunning) {
             try {
-                Thread.sleep(1000);
-                view.print("tik");
+                Thread.sleep(500);
+                process();
             } catch (Exception e) {
 
             }
         }
     }
 
-    public boolean createServer() {
-        //console.setText("Server");
-        return false;
+    public ProgramState getState() {
+        return state;
     }
 
-    public boolean createClient() {
-        //console.setText("Client");
-        return false;
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    public void createServer() {
+        state = ProgramState.CREATE_SERVER;
+    }
+
+    public void createClient() {
+        state = ProgramState.CREATE_CLIENT;
     }
 
     public void setIsRunning(boolean isRunning) {
         this.isRunning = isRunning;
+    }
+
+    public void resetState() {
+        state = ProgramState.START;
+    }
+
+    private void process() {
+        switch (state) {
+            case START:
+                view.print("ready");
+                break;
+            case CREATE_SERVER:
+                view.print("create server start");
+                state = ProgramState.WAIT_CLIENT;
+                break;
+            case CREATE_CLIENT:
+                view.print("create client start");
+                state = ProgramState.FIND_SERVER;
+                break;
+            case WAIT_CLIENT:
+                view.print("wait client");
+                break;
+            case FIND_SERVER:
+                view.print("find server");
+                break;
+        }
     }
 }
