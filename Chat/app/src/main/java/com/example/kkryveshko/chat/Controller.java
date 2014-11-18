@@ -1,5 +1,9 @@
 package com.example.kkryveshko.chat;
 
+import android.net.wifi.p2p.WifiP2pConfig;
+import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.view.View;
 import android.widget.Button;
 
@@ -13,6 +17,11 @@ public class Controller {
     private Model model;
     private Button buttonServer;
     private Button buttonClient;
+
+    private WifiP2pManager mWiFiManager;
+    private WifiP2pManager.Channel mWiFiChanell;
+    private WifiP2pDeviceList deviceList;
+    private boolean isConnected;
 
     public static Controller getInstance() {
         if (controller == null) {
@@ -67,5 +76,63 @@ public class Controller {
                 }
             }
         });
+    }
+
+    public void initWiFiManager(WifiP2pManager mManager) {
+        mWiFiManager = mManager;
+    }
+
+    public void initWiFiChannel(WifiP2pManager.Channel mChannel) {
+        mWiFiChanell = mChannel;
+    }
+
+    public void findPeers() {
+        mWiFiManager.discoverPeers(mWiFiChanell, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                appView.print("Founded");
+            }
+
+            @Override
+            public void onFailure(int reasonCode) {
+                appView.print("Devices not found");
+            }
+        });
+
+        while (deviceList == null) {
+            try {
+                Thread.sleep(100);
+            } catch (Exception e) {
+
+            }
+        }
+        for (WifiP2pDevice device : deviceList.getDeviceList()) {
+            appView.print(device.deviceName);
+        }
+    }
+
+    public void setWifiP2pDeviceList(WifiP2pDeviceList peers) {
+        deviceList = peers;
+    }
+
+    public void connectToPeer() {
+        if (!isConnected) {
+            WifiP2pDevice device = deviceList.getDeviceList().iterator().next();
+            WifiP2pConfig config = new WifiP2pConfig();
+            config.deviceAddress = device.deviceAddress;
+            mWiFiManager.connect(mWiFiChanell, config, new WifiP2pManager.ActionListener() {
+
+                @Override
+                public void onSuccess() {
+                    appView.print("Connect to device");
+                    isConnected = true;
+                }
+
+                @Override
+                public void onFailure(int reason) {
+                    appView.print("Device busy");
+                }
+            });
+        }
     }
 }

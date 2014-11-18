@@ -1,6 +1,9 @@
 package com.example.kkryveshko.chat;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.IntentFilter;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,6 +16,10 @@ public class MainActivity extends Activity {
     private Model model = Model.getInstance();
     private Controller controller = Controller.getInstance();
     private AppView appView = AppView.getInstance();
+    private WifiP2pManager mManager;
+    private WifiP2pManager.Channel mChannel;
+    private WiFiDirectBroadcastReceiver mReceiver;
+    private IntentFilter mIntentFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +30,24 @@ public class MainActivity extends Activity {
         }
         setViewElements();
         startProgram();
+        initWiFiManager();
+        initIntentFilter();
         initController();
+    }
+
+    private void initIntentFilter() {
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+    }
+
+    private void initWiFiManager() {
+        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+
+        mChannel = mManager.initialize(this, getMainLooper(), null);
+        mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
     }
 
     private void startProgram() {
@@ -42,6 +66,20 @@ public class MainActivity extends Activity {
         controller.init();
         controller.createServerButton((Button) findViewById(R.id.buttonServer));
         controller.createClientButton((Button) findViewById(R.id.buttonClient));
+        controller.initWiFiManager(mManager);
+        controller.initWiFiChannel(mChannel);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(mReceiver, mIntentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mReceiver);
     }
 
     @Override

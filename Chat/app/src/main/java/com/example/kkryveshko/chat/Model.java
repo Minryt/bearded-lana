@@ -9,6 +9,7 @@ public class Model implements Runnable {
     private boolean isRunning;
     private AppView view;
     private ProgramState state;
+    private Controller controller;
 
     public static Model getInstance() {
         if (model == null) {
@@ -20,6 +21,7 @@ public class Model implements Runnable {
     @Override
     public void run() {
         view = AppView.getInstance();
+        controller = Controller.getInstance();
         state = ProgramState.START;
 
         while (isRunning) {
@@ -59,21 +61,23 @@ public class Model implements Runnable {
     private void process() {
         switch (state) {
             case START:
-                view.print("ready");
+//                view.print("ready");
                 break;
             case CREATE_SERVER:
-                view.print("create server start");
+//                view.print("create server start");
                 state = ProgramState.WAIT_CLIENT;
                 break;
             case CREATE_CLIENT:
-                view.print("create client start");
+                controller.findPeers();
+//                view.print("create client start");
                 state = ProgramState.FIND_SERVER;
                 break;
             case WAIT_CLIENT:
-                view.print("wait client");
+//                view.print("wait client");
                 break;
             case FIND_SERVER:
-                view.print("find server");
+                controller.connectToPeer();
+//                view.print("find server");
                 break;
         }
     }

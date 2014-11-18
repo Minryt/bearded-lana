@@ -9,7 +9,7 @@ import android.widget.TextView;
  */
 public class AppView implements Runnable {
 
-    private static final int LOG_LINES = 10;
+    private static final int LOG_LINES = 100;
     private static AppView appView;
     private TextView eventLog;
     private Button buttonServer;
