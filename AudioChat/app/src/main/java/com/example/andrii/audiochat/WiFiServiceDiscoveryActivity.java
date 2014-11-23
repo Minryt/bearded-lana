@@ -25,7 +25,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.konstantin.audiochat.R;
+
 import com.example.andrii.audiochat.WiFiChatFragment.MessageTarget;
 import com.example.andrii.audiochat.WiFiDirectServicesList.DeviceClickListener;
 import com.example.andrii.audiochat.WiFiDirectServicesList.WiFiDevicesAdapter;
